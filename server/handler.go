@@ -12,6 +12,6 @@ type BaseHTTPHandler struct {
 }
 
 // NewLoggingResponseWriter creates new loggingResponseWriter instance for particular request
-func (h BaseHTTPHandler) NewLoggingResponseWriter(r *http.Request, w http.ResponseWriter) LoggingResponseWriter {
+func (h BaseHTTPHandler) NewLoggingResponseWriter(w http.ResponseWriter, r *http.Request) LoggingResponseWriter {
 	return newLoggingResponseWriter(h.Logger, r.RemoteAddr, r.Referer(), r.URL.Path, r.Method, w)
 }
