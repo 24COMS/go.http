@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/GeertJohan/go.rice"
+	"github.com/go-chi/chi/middleware"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-	"github.com/go-chi/chi/middleware"
 )
 
 const (
@@ -42,7 +42,7 @@ func NewBaseRouter(h BaseHTTPHandler, serviceVersion, profilerPath string) (*mux
 
 	// Register swagger handler
 	srv.HandleFunc(strings.Join([]string{"", swaggerBoxName, swaggerFileName}, "/"), func(w http.ResponseWriter, r *http.Request) {
-		l := h.NewLoggingResponseWriter(r, w)
+		l := h.NewLoggingResponseWriter(w, r)
 
 		_, err := io.Copy(w, bytes.NewReader(APIDefinition))
 		if err != nil {
@@ -53,7 +53,7 @@ func NewBaseRouter(h BaseHTTPHandler, serviceVersion, profilerPath string) (*mux
 	// VERSION
 	versionResp := []byte(`{"version":"` + serviceVersion + `"}`)
 	srv.HandleFunc("/version.json", func(w http.ResponseWriter, r *http.Request) {
-		l := h.NewLoggingResponseWriter(r, w)
+		l := h.NewLoggingResponseWriter(w, r)
 
 		w.Header().Set("Content-Type", "application/json")
 		_, err := w.Write(versionResp)
@@ -64,7 +64,6 @@ func NewBaseRouter(h BaseHTTPHandler, serviceVersion, profilerPath string) (*mux
 
 	// HTTP PROFILER
 	srv.Handle(profilerPath, middleware.Profiler())
-
 
 	return srv, nil
 }
