@@ -57,7 +57,9 @@ func NewBaseRouter(h BaseHTTPHandler, cfg BaseRouterCfg) (*mux.Router, error) {
 	})
 
 	// HTTP PROFILER
-	srv.Handle(cfg.ProfilerPath, middleware.Profiler())
+	if len(cfg.ProfilerPath) != 0 {
+		srv.Handle(cfg.ProfilerPath, middleware.Profiler())
+	}
 
 	return srv, nil
 }
