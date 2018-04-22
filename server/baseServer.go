@@ -14,8 +14,8 @@ var cors = handlers.CORS(
 	handlers.AllowedHeaders([]string{"Accept", "Content-Type", "Content-Length", "Accept-Encoding", "Authorization"}),
 )
 
-// NewServer will cinstruct http server with base configurations. Timeouts|TLS|CORS
-func NewServer(router http.Handler, tlsCerts []tls.Certificate, listenAddr string) *http.Server {
+// NewBaseServer will cinstruct http server with base configurations. Timeouts|TLS|CORS
+func NewBaseServer(router http.Handler, tlsCerts []tls.Certificate, listenAddr string) *http.Server {
 	return &http.Server{
 		Addr:         listenAddr,
 		Handler:      cors(router),
