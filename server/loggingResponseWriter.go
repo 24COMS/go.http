@@ -1,14 +1,14 @@
 package server
 
 import (
+	"encoding/json"
+	"encoding/xml"
 	"net/http"
 	"runtime"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"encoding/xml"
-	"encoding/json"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // LoggingResponseWriter describes methods of loggingResponseWriter helper
@@ -18,11 +18,10 @@ type LoggingResponseWriter interface {
 	// WriteHeaderWithErr same as WriteHeader but also will set and log error with metadata
 	WriteHeaderWithErr(code int, err error)
 	// WriteJSON is a helper that will set corresponding content type, encode your data and log response
-	WriteJSON(data interface{})
+	WriteJSON(data interface{}, status ...int)
 	// WriteXML is a helper that will set corresponding content type, encode your data and log response
-	WriteXML(data interface{})
+	WriteXML(data interface{}, status ...int)
 }
-
 
 type loggingResponseWriter struct {
 	rw         http.ResponseWriter
@@ -65,8 +64,13 @@ func (l *loggingResponseWriter) WriteHeaderWithErr(code int, err error) {
 }
 
 // WriteJSON is a helper that will set corresponding content type, encode your data and log response
-func (l *loggingResponseWriter) WriteJSON(data interface{}) {
+func (l *loggingResponseWriter) WriteJSON(data interface{}, status ...int) {
 	l.rw.Header().Set("Content-Type", "application/json")
+
+	if len(status) != 0 {
+		l.WriteHeader(status[0])
+	}
+
 	err := json.NewEncoder(l.rw).Encode(data)
 	if err != nil {
 		l.WriteHeaderWithErr(http.StatusInternalServerError, errors.Wrap(err, "failed to write response"))
@@ -76,7 +80,13 @@ func (l *loggingResponseWriter) WriteJSON(data interface{}) {
 }
 
 // WriteXML is a helper that will set corresponding content type, encode your data and log response
-func (l *loggingResponseWriter) WriteXML(data interface{}) {
+func (l *loggingResponseWriter) WriteXML(data interface{}, status ...int) {
+	l.rw.Header().Set("Content-Type", "application/xml")
+
+	if len(status) != 0 {
+		l.WriteHeader(status[0])
+	}
+
 	_, err := l.rw.Write([]byte(xml.Header))
 	if err != nil {
 		l.WriteHeaderWithErr(http.StatusInternalServerError, errors.Wrap(err, "failed to write xml header"))
