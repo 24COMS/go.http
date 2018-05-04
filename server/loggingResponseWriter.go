@@ -68,7 +68,8 @@ func (l *loggingResponseWriter) WriteJSON(data interface{}, status ...int) {
 	l.rw.Header().Set("Content-Type", "application/json")
 
 	if len(status) != 0 {
-		l.WriteHeader(status[0])
+		l.statusCode = status[0]
+		l.rw.WriteHeader(status[0])
 	}
 
 	err := json.NewEncoder(l.rw).Encode(data)
@@ -84,7 +85,8 @@ func (l *loggingResponseWriter) WriteXML(data interface{}, status ...int) {
 	l.rw.Header().Set("Content-Type", "application/xml")
 
 	if len(status) != 0 {
-		l.WriteHeader(status[0])
+		l.statusCode = status[0]
+		l.rw.WriteHeader(status[0])
 	}
 
 	_, err := l.rw.Write([]byte(xml.Header))
