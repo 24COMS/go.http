@@ -13,17 +13,19 @@ import (
 
 // LoggingResponseWriter describes methods of loggingResponseWriter helper
 type LoggingResponseWriter interface {
-	// WriteHeader will set and log response status code
-	WriteHeader(code int)
-	// WriteHeaderWithErr same as WriteHeader but also will set and log error with metadata
+	http.ResponseWriter
+	// Log will log request result
+	Log()
+	// WriteHeaderWithErr same as WriteHeader but also will set and Log error with metadata
 	WriteHeaderWithErr(code int, err error)
-	// WriteJSON is a helper that will set corresponding content type, encode your data and log response
+	// WriteJSON is a helper that will set corresponding content type, encode your data and Log response
 	WriteJSON(data interface{}, status ...int)
-	// WriteXML is a helper that will set corresponding content type, encode your data and log response
+	// WriteXML is a helper that will set corresponding content type, encode your data and Log response
 	WriteXML(data interface{}, status ...int)
 }
 
 type loggingResponseWriter struct {
+	logged     bool
 	rw         http.ResponseWriter
 	remoteAddr string
 	origin     string
@@ -35,7 +37,16 @@ type loggingResponseWriter struct {
 	logger     logrus.FieldLogger
 }
 
-func (l *loggingResponseWriter) log() {
+func (l *loggingResponseWriter) Header() http.Header {
+	return l.rw.Header()
+}
+
+func (l *loggingResponseWriter) Write(p []byte) (n int, err error) {
+	return l.rw.Write(p)
+}
+
+func (l *loggingResponseWriter) Log() {
+	l.logged = true
 	if l.error != nil {
 		pc, fn, line, _ := runtime.Caller(3)
 		l.logger.WithFields(logrus.Fields{
@@ -52,7 +63,7 @@ func (l *loggingResponseWriter) log() {
 func (l *loggingResponseWriter) WriteHeader(code int) {
 	l.statusCode = code
 	l.rw.WriteHeader(code)
-	l.log()
+	l.Log()
 }
 
 // WriteHeaderWithErr same as WriteHeader but also will set and log error with metadata
@@ -60,7 +71,7 @@ func (l *loggingResponseWriter) WriteHeaderWithErr(code int, err error) {
 	l.error = err
 	l.statusCode = code
 	l.rw.WriteHeader(code)
-	l.log()
+	l.Log()
 }
 
 // WriteJSON is a helper that will set corresponding content type, encode your data and log response
@@ -77,7 +88,7 @@ func (l *loggingResponseWriter) WriteJSON(data interface{}, status ...int) {
 		l.WriteHeaderWithErr(http.StatusInternalServerError, errors.Wrap(err, "failed to write response"))
 		return
 	}
-	l.log()
+	l.Log()
 }
 
 // WriteXML is a helper that will set corresponding content type, encode your data and log response
@@ -100,7 +111,7 @@ func (l *loggingResponseWriter) WriteXML(data interface{}, status ...int) {
 		l.WriteHeaderWithErr(http.StatusInternalServerError, errors.Wrap(err, "failed to write response"))
 		return
 	}
-	l.log()
+	l.Log()
 }
 
 // ******************************************************************************************************
@@ -129,7 +140,7 @@ func (l *loggingResponseWriter) WriteXML(data interface{}, status ...int) {
 //}
 
 func newLoggingResponseWriter(logger logrus.FieldLogger, remoteAddr, origin, uri, method string, w http.ResponseWriter) *loggingResponseWriter {
-	l := &loggingResponseWriter{w, remoteAddr, origin, uri, method, time.Now(), http.StatusOK, nil, nil}
+	l := &loggingResponseWriter{false, w, remoteAddr, origin, uri, method, time.Now(), http.StatusOK, nil, nil}
 	l.logger = logger.WithFields(logrus.Fields{
 		"ip":             remoteAddr,
 		"origin":         origin,
