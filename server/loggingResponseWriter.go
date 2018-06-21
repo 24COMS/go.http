@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"net/http"
+	"reflect"
 	"runtime"
 	"time"
 
@@ -83,7 +84,7 @@ func (l *loggingResponseWriter) WriteJSON(data interface{}, status ...int) {
 		l.rw.WriteHeader(status[0])
 	}
 
-	err := json.NewEncoder(l.rw).Encode(data)
+	err := json.NewEncoder(l.rw).Encode(checkForNil(data))
 	if err != nil {
 		l.WriteHeaderWithErr(http.StatusInternalServerError, errors.Wrap(err, "failed to write response"))
 		return
@@ -112,6 +113,28 @@ func (l *loggingResponseWriter) WriteXML(data interface{}, status ...int) {
 		return
 	}
 	l.Log()
+}
+
+func checkForNil(d interface{}) interface{} {
+	switch d.(type) {
+	case bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr, float32, float64, complex64, complex128, string:
+		return d
+	}
+	rVal := reflect.ValueOf(d)
+
+	if rVal.Kind() == reflect.Struct {
+		return d
+	}
+
+	if rVal.IsNil() {
+		switch rVal.Kind() {
+		case reflect.Slice:
+			return []struct{}{}
+		default:
+			return struct{}{}
+		}
+	}
+	return d
 }
 
 // ******************************************************************************************************
