@@ -2,21 +2,6 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/GeertJohan/go.rice"
-  packages = [
-    ".",
-    "embedded"
-  ]
-  revision = "c02ca9a983da5807ddf7d796784928f5be4afd09"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/daaku/go.zipexe"
-  packages = ["."]
-  revision = "a5fe2436ffcb3236e175e5149162b41cd28bd27d"
-
-[[projects]]
   name = "github.com/go-chi/chi"
   packages = [
     ".",
@@ -28,20 +13,20 @@
 [[projects]]
   name = "github.com/gorilla/context"
   packages = ["."]
-  revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
-  version = "v1.1"
+  revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
+  version = "v1.1.1"
+
+[[projects]]
+  name = "github.com/gorilla/handlers"
+  packages = ["."]
+  revision = "90663712d74cb411cbef281bc1e08c19d1a76145"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/gorilla/mux"
   packages = ["."]
-  revision = "53c1911da2b537f792e7cafcb446b05ffe33b996"
-  version = "v1.6.1"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/kardianos/osext"
-  packages = ["."]
-  revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
+  revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
+  version = "v1.6.2"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -59,7 +44,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "d6449816ce06963d9d136eee5a56fca5b0616e7e"
+  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
 
 [[projects]]
   branch = "master"
@@ -68,11 +53,11 @@
     "unix",
     "windows"
   ]
-  revision = "b126b21c05a91c856b027c16779c12e3bf236954"
+  revision = "1b2967e3c290b7c545b3db0deeda16e9be4f98a2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7d6caee6d3fc0d9089cc755800f1b69040e8bf082fbf235dd9f6190474fce73a"
+  inputs-digest = "cc9dede47895656f112662cd7eda8f354c8350a7e7f9cab2c5101d39974fadfe"
   solver-name = "gps-cdcl"
   solver-version = 1
