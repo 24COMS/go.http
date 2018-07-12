@@ -63,6 +63,9 @@ func (l *loggingResponseWriter) Log() {
 // WriteHeader will set and log response status code
 func (l *loggingResponseWriter) WriteHeader(code int) {
 	l.statusCode = code
+	if code == http.StatusNotFound {
+		l.rw.Header().Set("X-ServiceFabric", "ResourceNotFound")
+	}
 	l.rw.WriteHeader(code)
 	l.Log()
 }
@@ -72,6 +75,9 @@ func (l *loggingResponseWriter) WriteHeaderWithErr(code int, err error) {
 	l.error = err
 	l.statusCode = code
 	l.rw.WriteHeader(code)
+	if code == http.StatusNotFound {
+		l.rw.Header().Set("X-ServiceFabric", "ResourceNotFound")
+	}
 	l.Log()
 }
 
@@ -81,6 +87,9 @@ func (l *loggingResponseWriter) WriteJSON(data interface{}, status ...int) {
 
 	if len(status) != 0 {
 		l.statusCode = status[0]
+		if status[0] == http.StatusNotFound {
+			l.rw.Header().Set("X-ServiceFabric", "ResourceNotFound")
+		}
 		l.rw.WriteHeader(status[0])
 	}
 
@@ -98,6 +107,9 @@ func (l *loggingResponseWriter) WriteXML(data interface{}, status ...int) {
 
 	if len(status) != 0 {
 		l.statusCode = status[0]
+		if status[0] == http.StatusNotFound {
+			l.rw.Header().Set("X-ServiceFabric", "ResourceNotFound")
+		}
 		l.rw.WriteHeader(status[0])
 	}
 
